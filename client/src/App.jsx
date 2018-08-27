@@ -17,11 +17,13 @@ class App extends React.Component {
 
   componentDidMount() {
     const socket = createConnection();
-    socket.authenticate();
-    socket.onAuthenticate(() => {
-      socket.subscribeToTables();
+    socket.onConnect(() => {
+      socket.authenticate();
+      socket.onAuthenticate(() => {
+        socket.subscribeToTables();
+      });
+      socket.onTablesList(this.setTablesList);
     });
-    socket.onTablesList(this.setTablesList);
   }
 
   render() {

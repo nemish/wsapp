@@ -3,11 +3,6 @@ const USER_DATA = {
   "username": "user1234",
   "password": "password1234"
 };
-// {
-//   "$type": "login",
-//   "username": "user1234",
-//   "password": "password1234"
-// }
 
 const websocket = {
   connection: null,
@@ -17,6 +12,9 @@ const websocket = {
       $type: 'login',
       ...USER_DATA
     });
+  },
+  onConnect(cb) {
+    this.connection.onopen = cb;
   },
   onAuthenticate(cb) {
     this.callbacks['login_successful'] = [cb];
