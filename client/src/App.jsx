@@ -2,11 +2,20 @@ import * as React from 'react';
 import { createConnection } from './socket';
 import './index.css';
 
+import LobbyTable from './components/LobbyTable';
+import styled from  'react-emotion';
+
+import lobbyTables from './lobby-tables.json';
+
+const Container = styled('div')`
+	display: flex;
+`;
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      tables: []
+      tables: lobbyTables.tables
     };
     this.setTablesList = this.setTablesList.bind(this);
   }
@@ -16,26 +25,23 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const socket = createConnection();
-    socket.onConnect(() => {
-      socket.authenticate();
-      socket.onAuthenticate(() => {
-        socket.subscribeToTables();
-      });
-      socket.onTablesList(this.setTablesList);
-    });
+    // const socket = createConnection();
+    // socket.onConnect(() => {
+    //   socket.authenticate();
+    //   socket.onAuthenticate(() => {
+    //     socket.subscribeToTables();
+    //   });
+    //   socket.onTablesList(this.setTablesList);
+    // });
   }
 
   render() {
     return (
-      <div className="container">
-        <h1>Tables list:</h1>
-        <ul>
-          {this.state.tables.map(
-            (item, index) => <li key={index}>{item.name}</li>
-          )}
-        </ul>
-      </div>
+      <Container>
+        {this.state.tables.map(
+          (item, index) => <LobbyTable key={index} {...item} />
+        )}
+      </Container>
     );
   }
 }

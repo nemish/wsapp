@@ -47,11 +47,3 @@ table {
 	border-spacing: 0;
 }
 
-.container {
-	display: flex;
-}
-
-.container > div {
-	flex: 1;
-	padding: 10px;
-}
