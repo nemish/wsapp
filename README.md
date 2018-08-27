@@ -6,7 +6,8 @@ cd server
 npm i
 npm run dev
 ```
-Client
+In other terminal tab.
+Client.
 ```
 cd client
 npm i
