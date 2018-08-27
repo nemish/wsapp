@@ -8,6 +8,7 @@ class App extends React.Component {
     super(props);
     this.interval = null;
     this.state = {
+      sentMessages: [],
       messages: []
     }
   }
@@ -15,7 +16,9 @@ class App extends React.Component {
   componentDidMount() {
     const socket = io('localhost:3000');
     this.interval = setInterval(() => {
-      socket.emit('date message', new Date().toString());
+      const msg = new Date().toString();
+      this.setState({sentMessages: this.state.sentMessages.concat(msg)})
+      socket.emit('date message', msg);
     }, 2000);
     socket.on('ololo message', data => {
       this.setState({messages: this.state.messages.concat(data.msg)})
@@ -28,13 +31,23 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>Messages:</h1>
-        <ul>
-        {this.state.messages.map(
-          (msg, index) => <li key={index}>{msg}</li>
-        )}
-        </ul>
+      <div className="container">
+        <div>
+          <h1>Sent messages:</h1>
+          <ul>
+            {this.state.sentMessages.map(
+              (msg, index) => <li key={index}>{msg}</li>
+            )}
+          </ul>
+        </div>
+        <div>
+          <h1>Received messages:</h1>
+          <ul>
+            {this.state.messages.map(
+              (msg, index) => <li key={index}>{msg}</li>
+            )}
+          </ul>
+        </div>
       </div>
     );
   }
