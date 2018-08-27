@@ -1,4 +1,4 @@
-var wsUri = "wss://";
+var wsUri = "wss://js-assignment.evolutiongaming.com/ws_api";
 const USER_DATA = {
   "username": "user1234",
   "password": "password1234"
