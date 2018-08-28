@@ -19,21 +19,51 @@ const Table = ({participants, name}) => {
   </React.Fragment>;
 }
 
+class ItemEdit extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      name: props.name,
+      participants: props.participants,
+    };
+  }
+  
+  onNameChange(e){
+    this.setState({name: e.target.value});
+  }
+  
+  onParticipantsChange(e){
+      this.setState({participants: e.target.value})
+  }
 
-const ItemEdit = props => {
-  return <React.Fragment>
-    <Input name="name" />
-    <Input name="participants" />
-    <RoundButton 
-      onClick={() => {
-        console.log('onClick');
-      }}
-    >
-      SAVE
-    </RoundButton>
-    <CloseDiv />
-    
-  </React.Fragment>;
+  render(){
+    return <React.Fragment>
+      <Input name="name" value={this.state.name} onChange={this.onNameChange.bind(this)} type="text" />
+      <Input name="participants" value={this.state.participants} onChange={this.onParticipantsChange.bind(this)} type="text" />
+      <RoundButton2
+        onClick={(e) => {              
+          e.preventDefault();
+          if(this.props.onEditCancel){
+            this.props.onEditCancel();
+          }
+        }}
+      >
+        CANCEL
+      </RoundButton2>
+      <RoundButton2 
+        onClick={(e) => {
+          e.preventDefault();
+          if(this.props.onEditSave){
+            this.props.onEditSave(this.state.name, this.state.participants);
+          }
+        }}
+      >
+        SAVE
+      </RoundButton2>
+      <CloseDiv />
+
+    </React.Fragment>;
+  }
 }
 
 
@@ -43,38 +73,55 @@ export default class BarContainer extends React.Component {
     this.state = {
       edit: false
     };
-    this.onMouseOver = this.onMouseOver.bind(this);
-    this.onMouseOut = this.onMouseOut.bind(this);
     this.onClick = this.onClick.bind(this);
-  }
-
-  onMouseOut(e) {
-    e.preventDefault();
-    this.setState({edit: false});
-  }
-
-  onMouseOver(e) {
-    e.preventDefault();
-    this.setState({edit: true});
-  }
+    this.onEditSave = this.onEditSave.bind(this);
+    this.onEditCancel = this.onEditCancel.bind(this);
+  }  
   
   onClick(e) {
     e.preventDefault();
     this.setState({edit: true});
   }
+  
+  onEditSave(){
+    this.setState({edit: false});    
+  }
+  
+  onEditCancel(){
+    this.setState({edit: false});    
+  }      
 
   render() {
     let elem = null;
     if (this.state.edit) {
-      elem = <ItemEdit {...this.props} />;
+      elem = <ItemEdit 
+        {...this.props} 
+        onEditSave={this.onEditSave}
+        onEditCancel={this.onEditCancel}
+      />;
     } else {
-      elem = <Table {...this.props} />;
+      elem = <ClickDiv
+        onClick={this.onClick}
+      >
+        <Title>{this.props.name}</Title>
+        <ContainerList>
+          {PLAYERS.map((i, index) => {
+            return <Item key={index} active={this.props.participants < i} />;
+          })}
+        </ContainerList>
+      </ClickDiv>;
     }
-    return <Bar onClick={this.onClick} _onMouseOver={this.onMouseOver} _onMouseOut={this.onMouseOut}>
+    return <Bar 
+            
+    >
       {elem}
     </Bar>
   }
 }
+
+const ClickDiv = styled('div')`
+  cursor: pointer;
+`;
 
 const RoundButton = styled('button')`
   margin-top: 5px;
@@ -84,6 +131,11 @@ const RoundButton = styled('button')`
   border-radius: 5px;
   border: 1px solid #013346;
   box-shadow: inset 0 0 2px 0 #fff;  
+`;
+
+const RoundButton2 = styled(RoundButton)`
+  width: 70px;
+  margin-right: 15px;
 `;
 
 const Bar = styled('div')`
@@ -100,6 +152,7 @@ const Bar = styled('div')`
       _margin-bottom: 10px;
   }
 `;
+
 
 const Input = styled('input')`
   margin-top: 5px;
