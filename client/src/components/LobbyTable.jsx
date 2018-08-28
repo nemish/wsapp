@@ -4,20 +4,10 @@ import emptyImg from '../assets/images/empty.png';
 import existImg from '../assets/images/exist.png';
 import removeImg from '../assets/images/remove.png';
 import cancelImg from '../assets/images/cancel.svg';
+import { getConnection } from '../socket';
 
 const PLAYERS = Array.from({length: 12}, (v, i) => i);
 
-
-const Table = ({participants, name}) => {
-  return <React.Fragment>
-    <Title>{name}</Title>
-      <ContainerList>
-        {PLAYERS.map((i, index) => {
-          return <Item key={index} active={participants < i} />;
-        })}
-    </ContainerList>
-  </React.Fragment>;
-}
 
 class ItemEdit extends React.Component {
   constructor(props){
@@ -54,20 +44,20 @@ class ItemEdit extends React.Component {
         onClick={(e) => {
           e.preventDefault();
           if(this.props.onEditSave){
-            this.props.onEditSave(this.state.name, this.state.participants);
+            const { name, participants } = this.state;
+            this.props.onEditSave({name, participants});
           }
         }}
       >
         SAVE
       </RoundButton2>
-      <CloseDiv />
-
+      <CloseDiv onClick={this.props.onEditCancel} />
     </React.Fragment>;
   }
 }
 
 
-export default class BarContainer extends React.Component {
+export default class LobbyTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -76,14 +66,24 @@ export default class BarContainer extends React.Component {
     this.onClick = this.onClick.bind(this);
     this.onEditSave = this.onEditSave.bind(this);
     this.onEditCancel = this.onEditCancel.bind(this);
-  }  
-  
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      nextProps.participants !== this.props.participants
+      || nextProps.name !== this.props.name
+      || nextState.edit !== this.state.edit
+    );
+  }
+
   onClick(e) {
     e.preventDefault();
     this.setState({edit: true});
   }
   
-  onEditSave(){
+  onEditSave({name, participants}){
+    const { id } = this.props;
+    this.props.update({id, name, participants});
     this.setState({edit: false});    
   }
   
@@ -106,7 +106,7 @@ export default class BarContainer extends React.Component {
         <Title>{this.props.name}</Title>
         <ContainerList>
           {PLAYERS.map((i, index) => {
-            return <Item key={index} active={this.props.participants < i} />;
+            return <Item key={index} active={this.props.participants <= i} />;
           })}
         </ContainerList>
       </ClickDiv>;

@@ -22,15 +22,29 @@ const websocket = {
   onTablesList(cb) {
     this.callbacks['table_list'] = [cb];
   },
+  onUpdateFailure(cb) {
+    this.callbacks['update_failure'] = [cb];
+  },
   subscribeToTables() {
     this.send({
       $type: 'subscribe_tables'
+    });
+  },
+  updateTable({id, name, participants}) {
+    this.send({
+      $type: 'update_table',
+      table: {
+        id,
+        name,
+        participants,
+      }
     });
   },
   send(data) {
     this.connection.send(JSON.stringify(data));
   },
   onMessage(type, payload) {
+    console.log('===WS_GOT_MESSAGE===', type, payload);
     const cbs = this.callbacks[type];
     if (cbs && cbs.length) {
       cbs.forEach(cb => cb(payload));
@@ -38,7 +52,7 @@ const websocket = {
   },
 };
 
-export const createConnection = () => {
+export const getConnection = () => {
   if (websocket.connection) {
     return websocket;
   }
